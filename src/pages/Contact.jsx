@@ -4,6 +4,9 @@ import { Mail, Send, Sparkles, CheckCircle } from 'lucide-react';
 import { Github, Linkedin } from '../components/SocialIcons';
 import './Pages.css';
 
+const API_BASE =
+  import.meta.env.VITE_API_URL || 'https://portfolio-backend-2-7hvn.onrender.com';
+
 export default function Contact() {
   const [formData, setFormData] = useState({ name: '', email: '', message: '' });
   const [status, setStatus] = useState({ type: '', msg: '' });
@@ -23,24 +26,41 @@ export default function Contact() {
     setLoading(true);
     setStatus({ type: '', msg: '' });
 
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 45000);
+
     try {
-      const response = await fetch('http://localhost:5000/api/contact', {
+      await fetch(`${API_BASE}/api/health`, { signal: controller.signal }).catch(() => {});
+
+      const response = await fetch(`${API_BASE}/api/contact`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
+        signal: controller.signal,
       });
 
-      const data = await response.json();
+      const data = await response.json().catch(() => ({}));
 
       if (response.ok && data.success) {
         setStatus({ type: 'success', msg: 'Message received! I will get back to you shortly.' });
         setFormData({ name: '', email: '', message: '' });
       } else {
-        setStatus({ type: 'error', msg: data.error || 'Something went wrong. Please try again.' });
+        setStatus({
+          type: 'error',
+          msg: data.error || 'Something went wrong. Please try again.',
+        });
       }
     } catch (error) {
-      setStatus({ type: 'error', msg: 'Could not connect to server. Please try again later.' });
+      const msg =
+        error.name === 'AbortError'
+          ? 'Request timed out. The server may be waking up — please try again.'
+          : error.message === 'Failed to fetch'
+          ? 'Could not connect to server. Please try again later.'
+          : 'Something went wrong. Please try again.';
+
+      setStatus({ type: 'error', msg });
     } finally {
+      clearTimeout(timeoutId);
       setLoading(false);
     }
   };
