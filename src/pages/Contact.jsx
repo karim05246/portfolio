@@ -61,15 +61,38 @@ export default function Contact() {
     const timeoutId = setTimeout(() => controller.abort(), 45000);
 
     try {
-      const { response, data } = import.meta.env.PROD
-        ? await sendViaFormSubmit(formData, controller.signal)
-        : await sendViaApi(formData, controller.signal);
+      if (import.meta.env.PROD) {
+        try {
+          const apiResult = await sendViaApi(formData, controller.signal);
+          if (apiResult.response.ok && apiResult.data.success) {
+            setStatus({ type: 'success', msg: 'Message received! I will get back to you shortly.' });
+            setFormData({ name: '', email: '', message: '' });
+            return;
+          }
+        } catch {
+          // Fall through to FormSubmit
+        }
 
-      const isSuccess = import.meta.env.PROD
-        ? response.ok && (data.success === true || data.success === 'true')
-        : response.ok && data.success;
+        const { response, data } = await sendViaFormSubmit(formData, controller.signal);
+        const isSuccess = response.ok && (data.success === true || data.success === 'true');
 
-      if (isSuccess) {
+        if (isSuccess) {
+          setStatus({ type: 'success', msg: 'Message received! I will get back to you shortly.' });
+          setFormData({ name: '', email: '', message: '' });
+        } else {
+          setStatus({
+            type: 'error',
+            msg:
+              data.message ||
+              'Could not send message yet. Check your inbox for a FormSubmit activation email and click the link once.',
+          });
+        }
+        return;
+      }
+
+      const { response, data } = await sendViaApi(formData, controller.signal);
+
+      if (response.ok && data.success) {
         setStatus({ type: 'success', msg: 'Message received! I will get back to you shortly.' });
         setFormData({ name: '', email: '', message: '' });
       } else {
