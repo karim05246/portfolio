@@ -36,6 +36,17 @@
   --c-param:     #ffb86c;   /* orange — args */
   --c-error:     #ff5555;   /* red */
 
+  /* === SHARED PAGE TOKENS === */
+  --accent-cyan:   var(--c-accent);
+  --accent-purple: var(--c-keyword);
+  --bg-primary:    var(--app-bg);
+  --bg-secondary:  var(--sidebar-bg);
+  --bg-tertiary:   var(--tab-inactive-bg);
+  --border-color:  var(--border);
+  --text-light:    var(--text-primary);
+  --font-body:     var(--font-ui);
+  --transition-speed: 180ms;
+
   /* === WINDOW DOTS === */
   --dot-red:    #ff5555;
   --dot-yellow: #f1fa8c;
@@ -140,6 +151,9 @@ html {
 
 body { min-height: 100vh; overflow: hidden; }
 
+img, svg { max-width: 100%; }
+button, input, textarea, select { font: inherit; }
+
 a { color: inherit; text-decoration: none; }
 
 /* Scrollbars */
@@ -175,6 +189,7 @@ a { color: inherit; text-decoration: none; }
 }
 
 .titlebar-dots { display: flex; gap: 9px; align-items: center; }
+.mobile-explorer-toggle { display: none; }
 .dot { width: 13px; height: 13px; border-radius: 50%; }
 .dot.red    { background: var(--dot-red); }
 .dot.yellow { background: var(--dot-yellow); }
@@ -683,7 +698,7 @@ textarea.ide-input { resize: vertical; min-height: 100px; }
 /* =====================================================
    RESPONSIVE
    ===================================================== */
-@media (max-width: 860px) {
+@media (max-width: 768px) {
   :root { --sidebar-width: 0px; }
   .ide-sidebar { display: none; }
   .editor-content { padding: var(--space-md) var(--space-lg); }
@@ -693,3 +708,288 @@ textarea.ide-input { resize: vertical; min-height: 100px; }
   .ide-tab { padding: 0 var(--space-md); font-size: 0.76rem; }
   .line-numbers { display: none; }
 }
+
+/* =====================================================
+   RESPONSIVE IDE LAYOUT
+   ===================================================== */
+.container {
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+}
+
+.glass-panel {
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18);
+}
+
+.btn,
+.btn-primary,
+.btn-accent,
+.btn-muted {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.btn-primary,
+.btn-accent {
+  color: var(--text-primary);
+  background: rgba(189, 147, 249, 0.16);
+  border-color: rgba(189, 147, 249, 0.45);
+}
+
+.btn-muted {
+  color: var(--text-secondary);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.mobile-sidebar-backdrop {
+  display: none;
+}
+
+@media (max-width: 1024px) {
+  :root {
+    --sidebar-width: 235px;
+    --linenums-width: 44px;
+  }
+
+  .editor-content {
+    padding: var(--space-lg);
+  }
+
+  .ide-tab {
+    padding: 0 var(--space-md);
+  }
+}
+
+@media (max-width: 768px) {
+  :root {
+    --titlebar-height: 52px;
+    --tabs-height: 44px;
+    --statusbar-height: 34px;
+  }
+
+  html,
+  body,
+  .ide-shell {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  html {
+    font-size: 15px;
+  }
+
+  .ide-titlebar {
+    gap: var(--space-sm);
+    padding: 0 var(--space-sm);
+  }
+
+  .titlebar-dots {
+    display: none;
+  }
+
+  .mobile-explorer-toggle {
+    width: 40px;
+    height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    color: var(--text-primary);
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    position: relative;
+    z-index: 910;
+  }
+
+  .titlebar-name {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    font-size: 0.82rem;
+  }
+
+  .titlebar-name span {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .titlebar-controls {
+    gap: var(--space-sm);
+    flex-shrink: 0;
+  }
+
+  .theme-select {
+    max-width: 104px;
+    min-height: 38px;
+    padding: 5px 8px;
+    font-size: 0.78rem;
+  }
+
+  .titlebar-btn {
+    width: 40px;
+    height: 40px;
+    justify-content: center;
+    padding: 0;
+    font-size: 0;
+  }
+
+  .titlebar-btn svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .ide-workspace {
+    width: 100%;
+    min-width: 0;
+    position: relative;
+  }
+
+  .ide-sidebar {
+    display: flex;
+    position: fixed;
+    top: var(--titlebar-height);
+    left: 0;
+    bottom: var(--statusbar-height);
+    z-index: 900;
+    width: min(82vw, 300px);
+    max-width: 300px;
+    transform: translateX(-100%);
+    transition: transform var(--transition);
+    box-shadow: 20px 0 45px rgba(0, 0, 0, 0.32);
+  }
+
+  .ide-sidebar.is-open {
+    transform: translateX(0);
+  }
+
+  .mobile-sidebar-backdrop {
+    display: block;
+    position: fixed;
+    top: var(--titlebar-height);
+    right: 0;
+    bottom: var(--statusbar-height);
+    left: 0;
+    z-index: 850;
+    border: 0;
+    background: rgba(0, 0, 0, 0.42);
+    cursor: pointer;
+  }
+
+  .sidebar-header,
+  .tree-folder-row,
+  .tree-file-row {
+    font-size: 0.95rem;
+  }
+
+  .tree-folder-row,
+  .tree-file-row {
+    min-height: 44px;
+  }
+
+  .ide-editor-panel,
+  .editor-body,
+  .editor-content {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  .ide-tabs {
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+  }
+
+  .ide-tab {
+    min-width: max-content;
+    min-height: var(--tabs-height);
+    padding: 0 var(--space-md);
+    font-size: 0.86rem;
+  }
+
+  .tab-close {
+    padding: 8px 4px;
+  }
+
+  .line-numbers {
+    display: none;
+  }
+
+  .editor-content {
+    padding: var(--space-md);
+    overflow-x: hidden;
+  }
+
+  .ide-statusbar {
+    gap: var(--space-sm);
+    padding: 0 var(--space-sm);
+    overflow: hidden;
+  }
+
+  .statusbar-left,
+  .statusbar-right {
+    min-width: 0;
+    gap: var(--space-sm);
+  }
+
+  .statusbar-item {
+    font-size: 0.72rem;
+    white-space: nowrap;
+  }
+
+  .statusbar-right .statusbar-item:nth-last-child(-n + 2),
+  .statusbar-left .statusbar-item:nth-child(2) {
+    display: none;
+  }
+
+  .terminal-overlay {
+    padding: var(--space-sm);
+  }
+
+  .terminal-window {
+    height: calc(100vh - 24px);
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .theme-select {
+    max-width: 88px;
+  }
+
+  .titlebar-name .acc,
+  .titlebar-name .path-sep {
+    display: none;
+  }
+
+  .editor-content {
+    padding: 14px 12px;
+  }
+
+  .ide-tab {
+    padding: 0 12px;
+    font-size: 0.8rem;
+  }
+
+  .statusbar-right .statusbar-item:first-child {
+    display: none;
+  }
+}
+

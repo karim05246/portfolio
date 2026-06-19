@@ -662,3 +662,368 @@ textarea.form-input {
 .project-card:hover .project-img {
   transform: scale(1.05);
 }
+
+/* ==========================================
+   CODE-STYLE PAGE STRUCTURE
+   ========================================== */
+.code-block,
+.json-wrapper,
+.about-visual-overlay,
+.code-hero-intro,
+.code-project-card,
+.code-card-tags,
+.code-card-desc,
+.terminal-command-wrap,
+.code-section-header,
+.code-section-footer {
+  max-width: 100%;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.code-block {
+  width: 100%;
+}
+
+.code-file-header,
+.terminal-command-wrap,
+.code-section-header,
+.code-section-footer {
+  margin-bottom: 16px;
+}
+
+.prompt-prefix {
+  color: var(--c-entity);
+  font-weight: 700;
+}
+
+.code-hero-name {
+  font-size: clamp(1.5rem, 4vw, 2.7rem);
+  line-height: 1.25;
+}
+
+.code-console-log,
+.code-hero-tagline {
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
+.code-hero-actions,
+.code-card-actions,
+.about-tags-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.code-hero-actions {
+  margin-top: 28px;
+}
+
+.code-projects-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 24px;
+  margin-top: 22px;
+}
+
+.code-project-card {
+  padding: 22px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.code-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+
+.code-link-btn {
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  color: var(--text-secondary);
+}
+
+.json-indent {
+  padding-left: 22px;
+}
+
+.visual-badge,
+.badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 30px;
+  padding: 4px 10px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+}
+
+.gradient-text {
+  color: var(--accent-cyan);
+}
+
+@media (max-width: 768px) {
+  .container,
+  .page-container,
+  .code-block {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .page-container {
+    padding-top: 32px;
+    padding-bottom: 48px;
+    min-height: auto;
+  }
+
+  .section-title-wrap {
+    margin-bottom: 32px;
+    gap: 10px;
+  }
+
+  .section-tagline {
+    font-size: 0.78rem;
+  }
+
+  .section-title {
+    font-size: clamp(1.75rem, 8vw, 2.25rem);
+    line-height: 1.15;
+  }
+
+  .hero-section {
+    min-height: auto;
+    margin-bottom: 48px;
+  }
+
+  .hero-title {
+    font-size: clamp(2rem, 11vw, 3rem);
+    letter-spacing: 0;
+  }
+
+  .hero-subtitle,
+  .about-paragraph,
+  .contact-info p {
+    font-size: 1rem;
+  }
+
+  .hero-ctas,
+  .featured-header,
+  .project-actions,
+  .code-hero-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .featured-header {
+    gap: 18px;
+  }
+
+  .ide-btn,
+  .btn,
+  .btn-primary,
+  .btn-accent,
+  .btn-muted,
+  .filter-btn {
+    min-height: 44px;
+  }
+
+  .code-hero-intro[style],
+  .json-wrapper[style],
+  .about-visual-overlay[style],
+  .contact-success-state[style] {
+    padding: 22px !important;
+    border-radius: 12px !important;
+  }
+
+  .code-hero-name {
+    font-size: clamp(1.25rem, 7vw, 1.85rem);
+  }
+
+  .code-console-log,
+  .code-hero-tagline,
+  .terminal-command-wrap,
+  .code-section-header,
+  .code-section-footer,
+  .json-wrapper {
+    font-size: 0.94rem;
+    line-height: 1.65;
+  }
+
+  .json-indent {
+    padding-left: 12px;
+  }
+
+  .code-projects-grid,
+  .projects-grid,
+  .services-grid,
+  .soft-skills-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .project-card,
+  .service-card,
+  .timeline-card,
+  .soft-skill-card,
+  .benefits-box,
+  .contact-form-card,
+  .contact-card-wrap {
+    width: 100%;
+  }
+
+  .service-card,
+  .timeline-card,
+  .soft-skill-card,
+  .benefits-box,
+  .contact-form-card {
+    padding: 24px;
+  }
+
+  .project-img-wrapper[style] {
+    height: auto !important;
+    aspect-ratio: 16 / 10;
+  }
+
+  .project-img[style] {
+    height: 100% !important;
+    object-fit: cover !important;
+  }
+
+  .filter-bar {
+    justify-content: flex-start;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 8px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .filter-btn {
+    flex: 0 0 auto;
+    padding: 8px 16px;
+    font-size: 0.86rem;
+  }
+
+  .benefits-grid,
+  .contact-layout,
+  .about-grid {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+
+  .contact-info {
+    gap: 22px;
+  }
+
+  .contact-card-wrap {
+    align-items: center;
+    padding: 18px;
+  }
+
+  .contact-icon-box,
+  .service-icon-wrap {
+    flex: 0 0 auto;
+  }
+
+  .contact-details {
+    min-width: 0;
+  }
+
+  .contact-details p,
+  .contact-details a {
+    overflow-wrap: anywhere;
+  }
+
+  .form-input {
+    min-height: 46px;
+    font-size: 1rem;
+    padding: 13px 14px;
+  }
+
+  textarea.form-input {
+    min-height: 140px;
+  }
+
+  .timeline-container {
+    padding-left: 24px;
+  }
+
+  .timeline-dot {
+    left: -25px;
+  }
+
+  .timeline-item {
+    margin-bottom: 36px;
+  }
+}
+
+@media (max-width: 480px) {
+  .page-container {
+    padding-top: 24px;
+    padding-bottom: 36px;
+  }
+
+  .section-title-wrap {
+    margin-bottom: 26px;
+  }
+
+  .code-hero-intro[style],
+  .json-wrapper[style],
+  .about-visual-overlay[style],
+  .contact-success-state[style] {
+    padding: 18px !important;
+  }
+
+  .code-project-card,
+  .service-card,
+  .timeline-card,
+  .benefits-box,
+  .contact-form-card,
+  .contact-card-wrap {
+    padding: 18px;
+  }
+
+  .contact-card-wrap {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .timeline-header,
+  .project-header,
+  .code-card-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .project-actions,
+  .code-card-actions {
+    flex-direction: row;
+  }
+
+  .welcome-content[style] {
+    padding: 42px 22px !important;
+    border-radius: 16px !important;
+  }
+
+  .welcome-title[style] {
+    font-size: clamp(2.1rem, 12vw, 3rem) !important;
+    letter-spacing: 0 !important;
+  }
+
+  .welcome-subtitle[style] {
+    font-size: 1rem !important;
+  }
+}

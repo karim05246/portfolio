@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { HashRouter as Router, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
-import { TerminalIcon, GitBranch, Wifi, AlertCircle, ChevronRight, ChevronDown, Folder, FileCode2, FileJson, FileText, Home, User, Briefcase, Settings, Mail, Clock } from 'lucide-react';
+import { TerminalIcon, GitBranch, Wifi, AlertCircle, ChevronDown, Folder, FileCode2, FileJson, FileText, Clock, Menu, X } from 'lucide-react';
 import './index.css';
 import './App.css';
 import Terminal from './components/Terminal';
@@ -51,6 +51,7 @@ function IDEShell({ theme, setTheme, terminalOpen, setTerminalOpen }) {
   const location = useLocation();
   const navigate = useNavigate();
   const [tabs, setTabs] = useState(DEFAULT_TABS);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const FILE_MAP = FILE_TREE[0].files;
 
@@ -75,6 +76,10 @@ function IDEShell({ theme, setTheme, terminalOpen, setTerminalOpen }) {
     });
   };
 
+  const navigateFromExplorer = (path) => {
+    navigate(path);
+    setSidebarOpen(false);
+  };
   /* line numbers — 60 lines covers any page */
   const lineNums = Array.from({ length: 60 }, (_, i) => i + 1);
 
@@ -89,7 +94,17 @@ function IDEShell({ theme, setTheme, terminalOpen, setTerminalOpen }) {
           <span className="dot green" onClick={() => setTerminalOpen(true)}/>
         </div>
 
-        <div className="titlebar-name" onClick={() => navigate('/welcome')} style={{ cursor: 'pointer' }} title="Go to Welcome Page">
+        <button
+          className="mobile-explorer-toggle"
+          onClick={() => setSidebarOpen(prev => !prev)}
+          aria-label={sidebarOpen ? 'Close explorer' : 'Open explorer'}
+          aria-expanded={sidebarOpen}
+          aria-controls="portfolio-explorer"
+        >
+          {sidebarOpen ? <X size={18} /> : <Menu size={18} />}
+        </button>
+
+        <div className="titlebar-name" onClick={() => navigateFromExplorer('/welcome')} style={{ cursor: 'pointer' }} title="Go to Welcome Page">
           <span className="acc">portfolio</span>
           <span className="path-sep">/</span>
           <span style={{ color: currentFile?.color || 'var(--text-muted)' }}>{currentFile?.label}</span>
@@ -118,19 +133,19 @@ function IDEShell({ theme, setTheme, terminalOpen, setTerminalOpen }) {
       <div className="ide-workspace">
 
         {/* ── Sidebar ── */}
-        <aside className="ide-sidebar">
+        <aside id="portfolio-explorer" className={`ide-sidebar ${sidebarOpen ? 'is-open' : ''}`}>
           <div className="sidebar-header">Explorer</div>
           <div className="explorer-tree">
             {FILE_TREE.map(group => (
               <div key={group.folder}>
-                <div className="tree-folder-row" onClick={() => navigate('/welcome')} style={{ cursor: 'pointer' }} title="Go to Welcome Page">
+                <div className="tree-folder-row" onClick={() => navigateFromExplorer('/welcome')} style={{ cursor: 'pointer' }} title="Go to Welcome Page">
                   <ChevronDown size={14}/> {group.icon} {group.folder}
                 </div>
                 {group.files.map(file => (
                   <div
                     key={file.path}
                     className={`tree-file-row ${location.pathname === file.path ? 'active' : ''}`}
-                    onClick={() => navigate(file.path)}
+                    onClick={() => navigateFromExplorer(file.path)}
                   >
                     <span style={{ color: file.color }}>{file.icon}</span>
                     <span>{file.label}</span>
@@ -143,6 +158,7 @@ function IDEShell({ theme, setTheme, terminalOpen, setTerminalOpen }) {
             <span className="com">// v2.0.26-stable</span>
           </div>
         </aside>
+        {sidebarOpen && <button className="mobile-sidebar-backdrop" aria-label="Close explorer" onClick={() => setSidebarOpen(false)} />}
 
         {/* ── Editor ── */}
         <div className="ide-editor-panel">
@@ -250,3 +266,4 @@ export default function App() {
     </Router>
   );
 }
+
