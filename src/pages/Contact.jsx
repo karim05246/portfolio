@@ -4,8 +4,7 @@ import { Mail, Send, Sparkles, CheckCircle } from 'lucide-react';
 import { Github, Linkedin } from '../components/SocialIcons';
 import './Pages.css';
 
-const API_BASE =
-  import.meta.env.VITE_API_URL || 'https://portfolio-backend-2-7hvn.onrender.com';
+const API_BASE = import.meta.env.PROD ? '' : 'http://localhost:5000';
 
 export default function Contact() {
   const [formData, setFormData] = useState({ name: '', email: '', message: '' });
@@ -30,7 +29,7 @@ export default function Contact() {
     const timeoutId = setTimeout(() => controller.abort(), 45000);
 
     try {
-      await fetch(`${API_BASE}/api/health`, { signal: controller.signal }).catch(() => {});
+      let sent = false;
 
       const response = await fetch(`${API_BASE}/api/contact`, {
         method: 'POST',
@@ -42,8 +41,35 @@ export default function Contact() {
       const data = await response.json().catch(() => ({}));
 
       if (response.ok && data.success) {
+        sent = true;
         setStatus({ type: 'success', msg: 'Message received! I will get back to you shortly.' });
         setFormData({ name: '', email: '', message: '' });
+      } else if (!sent && import.meta.env.PROD) {
+        const fallback = await fetch('https://formsubmit.co/ajax/medkarimelbourai@gmail.com', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+          body: JSON.stringify({
+            name: formData.name,
+            email: formData.email,
+            message: formData.message,
+            _subject: `New contact from ${formData.name} via Portfolio`,
+            _template: 'table',
+            _captcha: 'false',
+          }),
+          signal: controller.signal,
+        });
+
+        const fallbackData = await fallback.json().catch(() => ({}));
+
+        if (fallback.ok && (fallbackData.success === true || fallbackData.success === 'true')) {
+          setStatus({ type: 'success', msg: 'Message received! I will get back to you shortly.' });
+          setFormData({ name: '', email: '', message: '' });
+        } else {
+          setStatus({
+            type: 'error',
+            msg: data.error || fallbackData.message || 'Something went wrong. Please try again.',
+          });
+        }
       } else {
         setStatus({
           type: 'error',
