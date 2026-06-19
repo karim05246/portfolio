@@ -4,7 +4,7 @@ import { Mail, Send, CheckCircle } from 'lucide-react';
 import { Github, Linkedin } from '../components/SocialIcons';
 import './Pages.css';
 
-const API_BASE = import.meta.env.PROD ? '' : 'http://localhost:5000';
+const API_BASE = import.meta.env.VITE_API_URL;
 const WEB3FORMS_KEY = import.meta.env.VITE_WEB3FORMS_ACCESS_KEY || '';
 
 async function sendViaWeb3Forms(formData, signal) {
