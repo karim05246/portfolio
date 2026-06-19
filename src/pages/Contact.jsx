@@ -1,23 +1,22 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Mail, Send, Sparkles, CheckCircle } from 'lucide-react';
+import { Mail, Send, CheckCircle } from 'lucide-react';
 import { Github, Linkedin } from '../components/SocialIcons';
 import './Pages.css';
 
 const API_BASE = import.meta.env.PROD ? '' : 'http://localhost:5000';
-const RECEIVER_EMAIL = 'medkarimelbourai@gmail.com';
+const WEB3FORMS_KEY = import.meta.env.VITE_WEB3FORMS_ACCESS_KEY || '';
 
-async function sendViaFormSubmit(formData, signal) {
-  const response = await fetch(`https://formsubmit.co/ajax/${RECEIVER_EMAIL}`, {
+async function sendViaWeb3Forms(formData, signal) {
+  const response = await fetch('https://api.web3forms.com/submit', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
     body: JSON.stringify({
+      access_key: WEB3FORMS_KEY,
       name: formData.name,
       email: formData.email,
       message: formData.message,
-      _subject: `New contact from ${formData.name} via Portfolio`,
-      _template: 'table',
-      _captcha: 'false',
+      subject: `New contact from ${formData.name} via Portfolio`,
     }),
     signal,
   });
@@ -61,38 +60,24 @@ export default function Contact() {
     const timeoutId = setTimeout(() => controller.abort(), 45000);
 
     try {
+      let response;
+      let data;
+
       if (import.meta.env.PROD) {
-        try {
-          const apiResult = await sendViaApi(formData, controller.signal);
-          if (apiResult.response.ok && apiResult.data.success) {
-            setStatus({ type: 'success', msg: 'Message received! I will get back to you shortly.' });
-            setFormData({ name: '', email: '', message: '' });
-            return;
-          }
-        } catch {
-          // Fall through to FormSubmit
-        }
-
-        const { response, data } = await sendViaFormSubmit(formData, controller.signal);
-        const isSuccess = response.ok && (data.success === true || data.success === 'true');
-
-        if (isSuccess) {
-          setStatus({ type: 'success', msg: 'Message received! I will get back to you shortly.' });
-          setFormData({ name: '', email: '', message: '' });
+        if (WEB3FORMS_KEY) {
+          ({ response, data } = await sendViaWeb3Forms(formData, controller.signal));
         } else {
-          setStatus({
-            type: 'error',
-            msg:
-              data.message ||
-              'Could not send message yet. Check your inbox for a FormSubmit activation email and click the link once.',
-          });
+          ({ response, data } = await sendViaApi(formData, controller.signal));
         }
-        return;
+      } else {
+        ({ response, data } = await sendViaApi(formData, controller.signal));
       }
 
-      const { response, data } = await sendViaApi(formData, controller.signal);
+      const isSuccess = import.meta.env.PROD && WEB3FORMS_KEY
+        ? response.ok && data.success
+        : response.ok && data.success;
 
-      if (response.ok && data.success) {
+      if (isSuccess) {
         setStatus({ type: 'success', msg: 'Message received! I will get back to you shortly.' });
         setFormData({ name: '', email: '', message: '' });
       } else {
@@ -104,7 +89,7 @@ export default function Contact() {
     } catch (error) {
       const msg =
         error.name === 'AbortError'
-          ? 'Request timed out. The server may be waking up — please try again.'
+          ? 'Request timed out. Please try again.'
           : error.message === 'Failed to fetch'
           ? 'Could not connect to server. Please try again later.'
           : 'Something went wrong. Please try again.';
@@ -168,7 +153,6 @@ export default function Contact() {
           </div>
         </div>
 
-        {/* Contact Form Card */}
         <div className="contact-form-card glass-panel">
           <AnimatePresence mode="wait">
             {status.type === 'success' ? (
