@@ -5,6 +5,38 @@ import { Github, Linkedin } from '../components/SocialIcons';
 import './Pages.css';
 
 const API_BASE = import.meta.env.PROD ? '' : 'http://localhost:5000';
+const RECEIVER_EMAIL = 'medkarimelbourai@gmail.com';
+
+async function sendViaFormSubmit(formData, signal) {
+  const response = await fetch(`https://formsubmit.co/ajax/${RECEIVER_EMAIL}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+    body: JSON.stringify({
+      name: formData.name,
+      email: formData.email,
+      message: formData.message,
+      _subject: `New contact from ${formData.name} via Portfolio`,
+      _template: 'table',
+      _captcha: 'false',
+    }),
+    signal,
+  });
+
+  const data = await response.json().catch(() => ({}));
+  return { response, data };
+}
+
+async function sendViaApi(formData, signal) {
+  const response = await fetch(`${API_BASE}/api/contact`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(formData),
+    signal,
+  });
+
+  const data = await response.json().catch(() => ({}));
+  return { response, data };
+}
 
 export default function Contact() {
   const [formData, setFormData] = useState({ name: '', email: '', message: '' });
@@ -29,51 +61,21 @@ export default function Contact() {
     const timeoutId = setTimeout(() => controller.abort(), 45000);
 
     try {
-      let sent = false;
+      const { response, data } = import.meta.env.PROD
+        ? await sendViaFormSubmit(formData, controller.signal)
+        : await sendViaApi(formData, controller.signal);
 
-      const response = await fetch(`${API_BASE}/api/contact`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-        signal: controller.signal,
-      });
+      const isSuccess = import.meta.env.PROD
+        ? response.ok && (data.success === true || data.success === 'true')
+        : response.ok && data.success;
 
-      const data = await response.json().catch(() => ({}));
-
-      if (response.ok && data.success) {
-        sent = true;
+      if (isSuccess) {
         setStatus({ type: 'success', msg: 'Message received! I will get back to you shortly.' });
         setFormData({ name: '', email: '', message: '' });
-      } else if (!sent && import.meta.env.PROD) {
-        const fallback = await fetch('https://formsubmit.co/ajax/medkarimelbourai@gmail.com', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-          body: JSON.stringify({
-            name: formData.name,
-            email: formData.email,
-            message: formData.message,
-            _subject: `New contact from ${formData.name} via Portfolio`,
-            _template: 'table',
-            _captcha: 'false',
-          }),
-          signal: controller.signal,
-        });
-
-        const fallbackData = await fallback.json().catch(() => ({}));
-
-        if (fallback.ok && (fallbackData.success === true || fallbackData.success === 'true')) {
-          setStatus({ type: 'success', msg: 'Message received! I will get back to you shortly.' });
-          setFormData({ name: '', email: '', message: '' });
-        } else {
-          setStatus({
-            type: 'error',
-            msg: data.error || fallbackData.message || 'Something went wrong. Please try again.',
-          });
-        }
       } else {
         setStatus({
           type: 'error',
-          msg: data.error || 'Something went wrong. Please try again.',
+          msg: data.error || data.message || 'Something went wrong. Please try again.',
         });
       }
     } catch (error) {
